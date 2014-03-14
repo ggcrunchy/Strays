@@ -31,3 +31,13 @@ print("Circular")
 vdump(convolve.CircularConvolve_1D({1,2,1},{1,2,3}))
 print("FFT")
 vdump(convolve.Convolve_FFT1D({1,2,1},{1,2,3}))
+
+-- Referring to:
+-- http://www.songho.ca/dsp/convolution/convolution2d_example.html
+-- http://www.johnloomis.org/ece563/notes/filter/conv/convolution.html
+vdump(M.Convolve_2D({1,2,3,4,5,6,7,8,9}, {-1,-2,-1,0,0,0,1,2,1}, 3, 3, "same"))
+vdump(M.Convolve_2D({	17,24,1,8,15,
+						23,5,7,14,16,
+						4,6,13,20,22,
+						10,12,19,21,3,
+						11,18,25,2,9 }, {1,3,1,0,5,0,2,1,2}, 5, 3))
