@@ -41,3 +41,7 @@ vdump(M.Convolve_2D({	17,24,1,8,15,
 						4,6,13,20,22,
 						10,12,19,21,3,
 						11,18,25,2,9 }, {1,3,1,0,5,0,2,1,2}, 5, 3))
+-- From a paper...
+vdump(M.CircularConvolve_2D({1,0,2,1}, {1,0,1,1}, 2,2))
+-- Contrast to http://www.mathworks.com/matlabcentral/answers/100887-how-do-i-apply-a-2d-circular-convolution-without-zero-padding-in-matlab
+-- but that seems to use a different padding strategy...
