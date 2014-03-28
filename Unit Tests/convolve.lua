@@ -36,26 +36,33 @@ vdump(convolve.Convolve_FFT1D({1,2,1},{1,2,3}))
 -- http://www.songho.ca/dsp/convolution/convolution2d_example.html
 -- http://www.johnloomis.org/ece563/notes/filter/conv/convolution.html
 vdump(convolve.Convolve_2D({1,2,3,4,5,6,7,8,9}, {-1,-2,-1,0,0,0,1,2,1}, 3, 3, "same"))
-local t1 = convolve.Convolve_2D({	17,24,1,8,15,
-									23,5,7,14,16,
-									4,6,13,20,22,
-									10,12,19,21,3,
-									11,18,25,2,9 }, {1,3,1,0,5,0,2,1,2}, 5, 3)
+
+local A, B, W, H =	17,24,1,8,15,
+					23,5,7,14,16,
+					4,6,13,20,22,
+					10,12,19,21,3,
+					11,18,25,2,9 }, {1,3,1,0,5,0,2,1,2}, 5, 3
+local t1 = convolve.Convolve_2D(A, B, W, H)
 vdump(t1)
 -- From a paper...
 vdump(M.CircularConvolve_2D({1,0,2,1}, {1,0,1,1}, 2,2))
 -- Contrast to http://www.mathworks.com/matlabcentral/answers/100887-how-do-i-apply-a-2d-circular-convolution-without-zero-padding-in-matlab
 -- but that seems to use a different padding strategy...
 
-local t2 = M.Convolve_FFT2D({	17,24,1,8,15,
-								23,5,7,14,16,
-								4,6,13,20,22,
-								10,12,19,21,3,
-								11,18,25,2,9 }, {1,3,1,0,5,0,2,1,2}, 5, 3)
+local t2 = M.Convolve_FFT2D(A, B, W, H, { method = "two_ffts" })
+local t3 = M.Convolve_FFT2D(A, B, W, H, { method = "goertzel" })
+local t4 = M.Convolve_FFT2D(A, B, W, H) -- separate fft's
+				
 print("COMPARING 2D convolve operations")
 for i = 1, #t1 do
 	if math.abs(t1[i] - t2[i]) > 1e-6 then
-		print("Problem at: " .. i)
+		print("Problem (method = Two FFT's) at: " .. i)
+	end
+	if math.abs(t3[i] - t2[i]) > 1e-6 then
+		print("Problem (method = Goertzels) at: " .. i)
+	end
+	if math.abs(t3[i] - t2[i]) > 1e-6 then
+		print("Problem (method = Separate FFT's) at: " .. i)
 	end
 end
 print("DONE")
