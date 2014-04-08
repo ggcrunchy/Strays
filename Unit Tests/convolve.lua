@@ -26,6 +26,7 @@
 local convolve = require("number_ops.convolve")
 
 local function CompareMethods (dim, t, ...)
+	print("")
 	print("COMPARING " .. dim .. "D FFT-based convolve operations...")
 
 	local comp, ok = { ... }, true
@@ -45,6 +46,8 @@ local function CompareMethods (dim, t, ...)
 	if ok then
 		print("All good!")
 	end
+
+	print("")
 end
 
 do
