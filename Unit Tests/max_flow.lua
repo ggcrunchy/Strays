@@ -57,3 +57,35 @@ do
 	print("Max flow = " .. tostring(a))
 	vdump(b)
 end
+
+-- Algorithms in C++ example
+do
+	local n, rn, cut = mf.MaxFlow_Labels({
+		["0"] = { ["1"] = 2, ["2"] = 3 },
+		["1"] = { ["3"] = 3, ["4"] = 1 },
+		["2"] = { ["3"] = 1, ["4"] = 1 },
+		["3"] = { ["5"] = 2 },
+		["4"] = { ["5"] = 3 }
+	}, "0", "5", { compute_mincut = true })
+	print("Flow: ", n)
+	print("Residual network and mincut")
+	vdump(rn)
+	vdump(cut)
+end
+
+-- Online example
+do
+	local n, rn, cut = mf.MaxFlow_Labels({
+		u = { v = 3 },
+		s = { u = 4, w = 2 },
+		v = { t = 2, x = 1 },
+		t = { x = 4 },
+		w = { x = 1 },
+		x = { u = 1, s = 3 },
+	}, "s", "t", { compute_mincut = true })
+
+	print("Flow: ", n)
+	print("Residual network and mincut")
+	vdump(rn)
+	vdump(cut)
+end
