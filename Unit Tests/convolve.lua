@@ -64,8 +64,13 @@ do
 	vdump(convolve.CircularConvolve_1D(A, B))
 	print("")
 
+	local Precomp = {}
+
+	convolve.PrecomputeKernel_1D(Precomp, #A, B)
+
 	CompareMethods(1, t1,
 		"Goertzels", convolve.ConvolveFFT_1D(A, B, { method = "goertzel" }),
+		"Precomputed Kernel", convolve.ConvolveFFT_1D(A, Precomp, { method = "precomputed_kernel" }),
 		"Separate FFT's", convolve.ConvolveFFT_1D(A, B, { method = "separate" }),
 		"Two FFT's", convolve.ConvolveFFT_1D(A, B)
 	)
@@ -81,12 +86,12 @@ do
 	vdump(convolve.Convolve_2D({1,2,3,4,5,6,7,8,9}, {-1,-2,-1,0,0,0,1,2,1}, 3, 3, "same"))
 	print("")
 
-	local A, B, W, H = {17,24,1,8,15,
+	local A, B, AW, BW = {17,24,1,8,15,
 						23,5,7,14,16,
 						4,6,13,20,22,
 						10,12,19,21,3,
 						11,18,25,2,9 }, {1,3,1,0,5,0,2,1,2}, 5, 3
-	local t1 = convolve.Convolve_2D(A, B, W, H) -- "full"
+	local t1 = convolve.Convolve_2D(A, B, AW, BW) -- "full"
 
 	-- From a paper...
 	vdump(convolve.CircularConvolve_2D({1,0,2,1}, {1,0,1,1}, 2,2))
@@ -94,10 +99,15 @@ do
 	-- but that seems to use a different padding strategy...
 	print("")
 
+	local Precomp = {}
+
+	convolve.PrecomputeKernel_2D(Precomp, #A, B, AW, BW)
+
 	CompareMethods(2, t1,
-		"Goertzels", convolve.ConvolveFFT_2D(A, B, W, H, { method = "goertzel" }),
-		"Separate FFT's", convolve.ConvolveFFT_2D(A, B, W, H, { method = "separate" }),
-		"Two FFT's", convolve.ConvolveFFT_2D(A, B, W, H)
+		"Goertzels", convolve.ConvolveFFT_2D(A, B, AW, BW, { method = "goertzel" }),
+		"Precomputed Kernel", convolve.ConvolveFFT_2D(A, Precomp, AW, BW, { method = "precomputed_kernel" }),
+		"Separate FFT's", convolve.ConvolveFFT_2D(A, B, AW, BW, { method = "separate" }),
+		"Two FFT's", convolve.ConvolveFFT_2D(A, B, AW, BW)
 	)
 end
 
