@@ -24,7 +24,8 @@
 --
 
 local convolve = require("number_ops.convolve")
-local fft = require("number_ops.fft")
+local fft = require("fft_ops.fft")
+local real_fft = require("fft_ops.real_fft")
 
 local function CompareMethods (dim, t, ...)
 	print("COMPARING " .. dim .. "D FFT-based convolve operations...")
@@ -99,18 +100,8 @@ do
 		"Two FFT's", convolve.ConvolveFFT_2D(A, B, W, H)
 	)
 end
----[[
+
 do
-	local function vdump2 (t)
-		for i = 1, #t do
-			if math.abs(t[i]) < 1e-9 then
-				t[i] = 0
-			end
-		end
-
-		vdump(t)
-	end
-
 	for _, v in ipairs{
 		{1,1,1,1,0,0,0,0}, {1,3,1,1,0,0,7,0}, {2,1,1,2,9,3,4,6}
 	} do
@@ -125,7 +116,7 @@ do
 		print("COMPARING STOCK AND REAL (1D) FFT's")
 
 		fft.FFT_1D(stock, n)
-		fft.RealFFT_1D(real, n)
+		real_fft.RealFFT_1D(real, n)
 
 		for i = 1, 2 * n do
 			if math.abs(stock[i] - real[i]) > 1e-9 then
@@ -141,7 +132,7 @@ do
 			print("COMPARING STOCK AND REAL (1D) IFFT's (recovering original data)")
 
 			fft.IFFT_1D(stock, n)
-			fft.RealIFFT_1D(real, n / 2)
+			real_fft.RealIFFT_1D(real, n / 2)
 		
 			for i = 1, n do
 				local j = 2 * i - 1
@@ -190,7 +181,7 @@ do
 	print("COMPARING STOCK AND REAL (2D) FFT's")
 
 	fft.FFT_2D(stock, W, H)
-	fft.RealFFT_2D(real, W, H)
+	real_fft.RealFFT_2D(real, W, H)
 
 	for i = 1, 2 * W * H do
 		if math.abs(stock[i] - real[i]) > 1e-9 then
@@ -206,7 +197,7 @@ do
 		print("COMPARING STOCK AND REAL (2D) IFFT's (recovering original data)")
 
 		fft.IFFT_2D(stock, W, H)
-		fft.RealIFFT_2D(real, W / 2, H)
+		real_fft.RealIFFT_2D(real, W / 2, H)
 	
 		for i = 1, W * H do
 			local j = 2 * i - 1
