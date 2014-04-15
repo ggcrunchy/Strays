@@ -23,7 +23,9 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
-local convolve = require("number_ops.convolve")
+local circular_convolution = require("signal_ops.circular_convolution")
+local fft_convolution = require("signal_ops.fft_convolution")
+local linear_convolution = require("signal_ops.linear_convolution")
 local fft = require("fft_ops.fft")
 local real_fft = require("fft_ops.real_fft")
 
@@ -56,23 +58,23 @@ do
 	print("")
 	print("Linear")
 	local A, B = {1,2,1}, {1,2,3}
-	local t1 = convolve.Convolve_1D(A, B)
+	local t1 = linear_convolution.Convolve_1D(A, B)
 	vdump(t1)
 	print("")
 
 	print("Circular")
-	vdump(convolve.CircularConvolve_1D(A, B))
+	vdump(circular_convolution.Convolve_1D(A, B))
 	print("")
 
 	local Precomp = {}
 
-	convolve.PrecomputeKernel_1D(Precomp, #A, B)
+	fft_convolution.PrecomputeKernel_1D(Precomp, #A, B)
 
 	CompareMethods(1, t1,
-		"Goertzels", convolve.ConvolveFFT_1D(A, B, { method = "goertzel" }),
-		"Precomputed Kernel", convolve.ConvolveFFT_1D(A, Precomp, { method = "precomputed_kernel" }),
-		"Separate FFT's", convolve.ConvolveFFT_1D(A, B, { method = "separate" }),
-		"Two FFT's", convolve.ConvolveFFT_1D(A, B)
+		"Goertzels", fft_convolution.Convolve_1D(A, B, { method = "goertzel" }),
+		"Precomputed Kernel", fft_convolution.Convolve_1D(A, Precomp, { method = "precomputed_kernel" }),
+		"Separate FFT's", fft_convolution.Convolve_1D(A, B, { method = "separate" }),
+		"Two FFT's", fft_convolution.Convolve_1D(A, B)
 	)
 end
 
@@ -83,7 +85,7 @@ do
 	-- Referring to:
 	-- http://www.songho.ca/dsp/convolution/convolution2d_example.html
 	-- http://www.johnloomis.org/ece563/notes/filter/conv/convolution.html
-	vdump(convolve.Convolve_2D({1,2,3,4,5,6,7,8,9}, {-1,-2,-1,0,0,0,1,2,1}, 3, 3, "same"))
+	vdump(linear_convolution.Convolve_2D({1,2,3,4,5,6,7,8,9}, {-1,-2,-1,0,0,0,1,2,1}, 3, 3, "same"))
 	print("")
 
 	local A, B, AW, BW = {17,24,1,8,15,
@@ -91,23 +93,23 @@ do
 						4,6,13,20,22,
 						10,12,19,21,3,
 						11,18,25,2,9 }, {1,3,1,0,5,0,2,1,2}, 5, 3
-	local t1 = convolve.Convolve_2D(A, B, AW, BW) -- "full"
+	local t1 = linear_convolution.Convolve_2D(A, B, AW, BW) -- "full"
 
 	-- From a paper...
-	vdump(convolve.CircularConvolve_2D({1,0,2,1}, {1,0,1,1}, 2,2))
+	vdump(circular_convolution.Convolve_2D({1,0,2,1}, {1,0,1,1}, 2,2))
 	-- Contrast to http://www.mathworks.com/matlabcentral/answers/100887-how-do-i-apply-a-2d-circular-convolution-without-zero-padding-in-matlab
 	-- but that seems to use a different padding strategy...
 	print("")
 
 	local Precomp = {}
 
-	convolve.PrecomputeKernel_2D(Precomp, #A, B, AW, BW)
+	fft_convolution.PrecomputeKernel_2D(Precomp, #A, B, AW, BW)
 
 	CompareMethods(2, t1,
-		"Goertzels", convolve.ConvolveFFT_2D(A, B, AW, BW, { method = "goertzel" }),
-		"Precomputed Kernel", convolve.ConvolveFFT_2D(A, Precomp, AW, BW, { method = "precomputed_kernel" }),
-		"Separate FFT's", convolve.ConvolveFFT_2D(A, B, AW, BW, { method = "separate" }),
-		"Two FFT's", convolve.ConvolveFFT_2D(A, B, AW, BW)
+		"Goertzels", fft_convolution.Convolve_2D(A, B, AW, BW, { method = "goertzel" }),
+		"Precomputed Kernel", fft_convolution.Convolve_2D(A, Precomp, AW, BW, { method = "precomputed_kernel" }),
+		"Separate FFT's", fft_convolution.Convolve_2D(A, B, AW, BW, { method = "separate" }),
+		"Two FFT's", fft_convolution.Convolve_2D(A, B, AW, BW)
 	)
 end
 
