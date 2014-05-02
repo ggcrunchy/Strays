@@ -292,3 +292,77 @@ print("")
 --print("TWO")
 	end
 end
+
+
+
+
+
+
+
+
+
+
+--++++++++++++++++++++++++++++++++++++++++
+local STATE={}
+local NCOLS, NROWS
+local function C (i, qt)
+	local cost = Costs[i] or 0
+	if cost < 1e11 then
+		if cost ~= 0 then
+			if qt then
+				qt[#qt + 1] = cost
+			end
+			return "?"
+		else
+			return STATE[i]
+		end
+	else
+		return "!"
+	end
+end
+function DUMP (what, phase, qs)
+	if AA then return end
+	print(what)
+	for i = 1, NCOLS^2 do
+		STATE[i]="0"
+	end
+	if not phase or phase == 2 then
+		for row = 1, NROWS do
+			local ri = (row - 1) * NCOLS + 1
+			local col = RowStar[ri]
+			if col < NCOLS then
+				STATE[ri + col] = "*"
+			end
+		end
+		for ri, col in pairs(Primes) do
+			STATE[ri + col] = "P"
+		end
+	end
+	print("************************")
+	local index, qt = 1, qs and {}
+	for _ = 1, NROWS do
+		local t={}
+		for _ = 1, NCOLS do
+			t[#t+1], index = C(index, qt), index + 1
+		end
+		print(table.concat(t, " "))
+	end
+	print("************************")
+	if false then--not phase then
+		for i = 1, NCOLS do
+			if vector.IsBitClear(FreeColBits, i - 1) then
+				print("Column " .. i .. " covered")
+			end
+		end
+		for i = 1, NROWS do
+			if vector.IsBitClear(FreeRowBits, i - 1) then
+				print("Row " .. i .. " covered")
+			end
+		end
+	end
+	if qt and #qt > 0 then
+		vdump(qt)
+	end
+	print("")
+end
+--++++++++++++++++++++++++++++++++++++++++
