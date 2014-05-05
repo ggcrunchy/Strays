@@ -367,9 +367,17 @@ function DUMP (what, phase, qs)
 end
 --++++++++++++++++++++++++++++++++++++++++
 
+-- in hungarian, above AuxRun:
+
+--[[
+local COSTS=Costs
+local NN=0
+]]
+
 -- in hungarian, AuxRun():
 
 --[[
+
 local a={}
 
 local nreads, nwrites = 0, 0
@@ -377,7 +385,7 @@ Costs = setmetatable({}, {
 	__index = function(t, k)
 			nreads=nreads+1
 		if not BB then
-		a[#a+1]=("read %i {%i}, (%s)"):format(k, DIAG[k] or -1, tostring(costs[k]))
+		a[#a+1]=("read %i {%i}, (%s)"):format(k, DIAG[k] or -1, tostring(COSTS[k]))
 		end
 		return COSTS[k]
 	end,
