@@ -586,3 +586,59 @@ end
 	end
 end
 ]]
+
+
+-- in seams sample:
+
+--[=[
+
+-- From LoadCosts():
+
+	-- Initialize all costs to some improbably large (but finite) energy value.
+--[[
+	for j = 1, n do
+		costs[ri + j] = 1e12
+	end
+
+	--
+	offset = offset - ri
+
+	costs[ahead - offset] = GetEnergyDiff(ahead, energy)
+
+	if diag1 then
+		costs[diag1 - offset] = GetEnergyDiff(diag1, energy)
+	end
+
+	if diag2 then
+		costs[diag2 - offset] = GetEnergyDiff(diag2, energy)
+	end
+
+	return ri + n
+--]]
+
+-- Global:
+
+local TOTAL_COST={}
+
+-- From SolveAssignment:
+
+--	hungarian.Run(costs, n, opts)
+
+local cost=0 -- before loop
+
+cost = cost + abs(energy-into.prev) -- in loop
+
+TOTAL_COST[#TOTAL_COST+1]=cost -- after loop
+
+-- After sorting costs on first pass:
+
+local t={}
+for i = 1, #TOTAL_COST do
+	t[#t+1] = i .. " (" .. TOTAL_COST[i] .. ")"
+	if #t == 3 or i == #TOTAL_COST then
+		print("COSTS: ", table.concat(t, ", "))
+		t={}
+	end
+end
+
+]=]
