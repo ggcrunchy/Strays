@@ -641,4 +641,54 @@ for i = 1, #TOTAL_COST do
 	end
 end
 
+-- adapted:
+
+local f=io.open(system.pathForFile("Out.txt", system.DocumentsDirectory), "w")
+if f then
+local t={}
+for i = 1, #TOTAL_COST do
+	t[#t+1] = i .. " (" .. TOTAL_COST[i] .. ")"
+	if #t == 3 or i == #TOTAL_COST then
+		f:write("COSTS: ", table.concat(t, ", "), "\n")
+		t={}
+	end
+end
+f:close()
+end
+
+-- read:
+
+local function ReadFile (name)
+	local f = io.open(system.pathForFile(name, system.DocumentsDirectory), "r")
+	local a = {}
+	if f then
+		local s = f:read("*a")
+		for k in s:gmatch("(%b())") do
+			a[#a+1]= tonumber(k:sub(2, -2))
+		end
+		f:close()
+	end
+	return a
+end
+
+local function CompareFiles (name1, name2)
+	print("Comparing", name1, name2)
+	local a, b = ReadFile(name1), ReadFile(name2)
+	if #a ~= #b then
+		print("Sizes differ!")
+	else
+		for i = 1, #a do
+			if a[i] ~= b[i] then
+				print("Difference at", i, a[i], b[i])
+				return
+			end
+		end
+		print("All good!")
+	end
+end
+CompareFiles("CheckDense.txt", "CheckDiagonal.txt")
+CompareFiles("ArrowDense.txt", "ArrowDiagonal.txt")
+CompareFiles("BackgroundDense.txt", "BackgroundDiagonal.txt")
+CompareFiles("ArrowDiagonal.txt", "Out.txt")
+
 ]=]
