@@ -642,3 +642,8 @@ for i = 1, #TOTAL_COST do
 end
 
 ]=]
+
+local eat=hungarian.Run({1,2,3,2,4,6,3,6,9},3)
+local out=hungarian.Run_Labels{ ted = { a = 1, b = 2, c = 3 }, joe = { a = 2, b = 4, c = 6 }, ann = { a = 3, b = 6, c = 9 } }
+vdump(out)
+vdump(eat)
