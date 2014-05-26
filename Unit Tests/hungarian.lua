@@ -641,6 +641,7 @@ for i = 1, #TOTAL_COST do
 	end
 end
 
+<<<<<<< HEAD
 -- adapted:
 
 local f=io.open(system.pathForFile("Out.txt", system.DocumentsDirectory), "w")
@@ -692,3 +693,11 @@ CompareFiles("BackgroundDense.txt", "BackgroundDiagonal.txt")
 CompareFiles("ArrowDiagonal.txt", "Out.txt")
 
 ]=]
+=======
+]=]
+
+local eat=hungarian.Run({1,2,3,2,4,6,3,6,9},3)
+local out=hungarian.Run_Labels{ ted = { a = 1, b = 2, c = 3 }, joe = { a = 2, b = 4, c = 6 }, ann = { a = 3, b = 6, c = 9 } }
+vdump(out)
+vdump(eat)
+>>>>>>> 69418558613b73aba8682be0449681508e9112f6
