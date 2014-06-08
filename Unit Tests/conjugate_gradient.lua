@@ -23,50 +23,58 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
---[[
--- STUFF TO READ:
-	-- http://en.wikipedia.org/wiki/Incomplete_Cholesky_factorization
-	-- http://en.wikipedia.org/wiki/Conjugate_gradient_method
-	-- http://en.wikipedia.org/wiki/Preconditioner
-	-- http://en.wikipedia.org/wiki/Cholesky_factorization
+-- TODO: More thorough tests (take random number idea from x, generalize dimension, etc.)
 
-	local sqrt = math.sqrt
+local la = require("number_ops.linear_algebra")
 
-	--
-	local function ICCG (a, n)
-		local out, ri, di = {}, 0, 1
+local m = { 4, 12, -16, 12, 37, -43, -16, -43, 98 }
+local l, u = { 2, 6, 1, -8, 5, 3 }, { 2, 6, -8, 1, 5, 3 }
 
-		for i = 1, n do
-			local index = ri + i
-			local sqr = a[index]
+local x = { math.random(), math.random(), math.random() }
 
-			for j = 1, i - 1 do
-				sqr = sqr - out[di - j]^2
-			end
+print("RANDOM!")
+vdump(x)
 
-			local diag = sqrt(sqr)
+local b = {}
 
-			out[di] = diag
+la.MatrixTimesVector(b, m, x, 3)
 
-			local ij, ji, vstep = index, di, i
+print("B")
+vdump(b)
 
-			for j = i + 1, n do
-				ij, ji, vstep = ij + 1, ji + vstep, vstep + 1
+local xx = {}
 
-				local diff, ik, jk = a[ij], di - 1, ji - 1
+la.EvaluateLU_Compact (xx, l, u, b, 3)
 
-				for k = 1, i - 1 do
-					diff, ik, jk = diff - out[ik] * out[jk], ik - 1, jk - 1
-				end
+print("INVERTED")
+vdump(xx)
 
-				out[ji] = diff / diag
-			end
+local cg = require("number_ops.conjugate_gradient")
 
-			ri, di = ri + n, di + i + 1
-		end
+	local X = {}
+	local M = { 4, 1, 1, 3 }
+	local DIM = 2
+	local B, X0 = { 1, 2 }, { 2, 1 }
 
-		return out
-	end
-	local b = ICCG({4,12,-16,12,37,-43,-16,-43,98}, 3)
-	vdump(b)
-]]
+	cg.ConjugateGradient(X, M, B, DIM, X0)
+print(1/11,7/11)
+	vdump(X)
+--[=[
+	--[[
+					 [4 1][x1] = [1]		[2]		[1/11]
+		Example Ax = [1 3][x2] = [2], x0 = 	[1], x =[7/11]
+	]]
+--]=]
+
+print("Preconditioned...")
+
+local chol = require("number_ops.cholesky")
+
+local LT={}
+
+chol.IncompleteLT(LT, M, DIM) -- ??? (no real idea what to pick...)
+
+cg.ConjugateGradient_PrecondLT (X, LT, M, B, DIM, X0)
+
+vdump(X)
+-- works... who knows how well...
