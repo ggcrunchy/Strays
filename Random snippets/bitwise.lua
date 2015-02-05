@@ -43,3 +43,33 @@ function bxor (a, b)
 
 	return c
 end
+
+--[[
+Incremental Gray code:
+    --
+    local half, inc = 0, 1
+
+	for i = ... -- loop
+        local gray = 0
+
+	    -- Compute the Gray code.
+	    local a, b, arem, flag = i, half, inc, 1
+
+        repeat
+	        local brem = b % 2
+
+	        if arem ~= brem then
+	            gray = gray + flag
+            end	            
+
+	        a, b = .5 * (a - arem), .5 * (b - brem)
+	        arem = a % 2
+	        flag = 2 * flag
+	    until a == b
+
+	-- stuff...
+
+		-- Update Gray code state.
+		half, inc = half + inc, 1 - inc
+	end
+]]
