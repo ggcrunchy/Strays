@@ -24,7 +24,7 @@
 --
 
 local fo = require("coroutine_ops.flow")
-local gi = require("iterator_ops.grid")
+local gi = require("iterator_ops.grid.ellipse") -- or circle, etc.
 local tt = require("corona_utils.timers")
 
 local Dim, FadeMS = 10, 75

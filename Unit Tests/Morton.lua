@@ -43,3 +43,45 @@ local function MortonNaive (x, y, z)
 
 	return result
 end
+
+-- Update tests
+
+--[[
+local mn = require("number_sequences.morton")
+
+for _, x in ipairs{ 2, 27, 10003, 59253 } do
+	for _, y in ipairs{ 900, 84, 10000, 60000 } do
+		local num = mn.Morton2(x, y)
+		local mx, my = mn.MortonPair(num)
+		local x1, x2, y1, y2 = 32007, 803, 9339, 27
+
+		local a1, b1 = mn.MortonPairUpdate_X(num, x1), mn.Morton2(x1, y)
+		local a2, b2 = mn.MortonPairUpdate_X(num, x2), mn.Morton2(x2, y)
+		local a3, b3 = mn.MortonPairUpdate_Y(num, y1), mn.Morton2(x, y1)
+		local a4, b4 = mn.MortonPairUpdate_Y(num, y2), mn.Morton2(x, y2)
+
+		print("MORTON2!", num, mx, my, a1 == b1, a2 == b2, a3 == b3, a4 == b4)
+		print("")
+	end
+end
+
+for _, x in ipairs{ 2, 27, 103, 5925 } do
+	for _, y in ipairs{ 900, 84, 1000, 600 } do
+		for _, z in ipairs{ 87, 1011, 330, 57 } do
+			local num = mn.Morton3(x, y, z)
+			local mx, my, mz = mn.MortonTriple(num)
+			local x1, x2, y1, y2, z1, z2 = 307, 803, 933, 27, 402, 534
+
+			local a1, b1 = mn.MortonTripleUpdate_X(num, x1), mn.Morton3(x1, y, z)
+			local a2, b2 = mn.MortonTripleUpdate_X(num, x2), mn.Morton3(x2, y, z)
+			local a3, b3 = mn.MortonTripleUpdate_Y(num, y1), mn.Morton3(x, y1, z)
+			local a4, b4 = mn.MortonTripleUpdate_Y(num, y2), mn.Morton3(x, y2, z)
+			local a5, b5 = mn.MortonTripleUpdate_Z(num, z1), mn.Morton3(x, y, z1)
+			local a6, b6 = mn.MortonTripleUpdate_Z(num, z2), mn.Morton3(x, y, z2)
+
+			print("MORTON3!", num, mx, my, mz, a1 == b1, a2 == b2, a3 == b3, a4 == b4, a5 == b5, a6 == b6)
+			print("")
+		end
+	end
+end
+]]
