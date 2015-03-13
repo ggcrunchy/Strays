@@ -46,42 +46,109 @@ end
 
 -- Update tests
 
+local mc = require("number_sequences.morton")
+---[=[
+---[[
+require("corona_utils.timers").WrapEx(function()
+--]]
+do
+--[==[
+	local xt = { 0, 47, 892, 1000, 1020, 3434, 5000, 6983, 23434, 32321, 50000, 65535 }
+	for i, x in ipairs(xt) do
+		local mx, my = mc.Morton2(0xFFFF, x), mc.Morton2(x, 0xFFFF)
+		local yt, x2 = { 0, 89, 332, 933, 1001, 7000, 34343, 65535 }, xt[i+1]
+		for j, y in ipairs(yt) do
 --[[
-local mn = require("number_sequences.morton")
+			if mc.MortonPairUpdate_X(mx, y) ~= mc.Morton2(y, x) then
+				print("Bad update2 x!", y, x)
+			end
+			if mc.MortonPairUpdate_Y(my, y) ~= mc.Morton2(x, y) then
+				print("Bad update2 y!", x, y)
+			end
+--]]
+---[[
+			local y2, nx, ny = yt[j+1], 0, 0
+			for num, xx in mc.Morton2_LineX(y, x, x2) do
+				assert(xx >= x and (xx == 0xFFFF or xx <= x2), "Bad line x")
+				assert(num == mc.Morton2(xx, y), "Bad line x solution")
+				nx=nx+1
+				if nx % 500 == 0 then coroutine.yield() end
+			end
+			coroutine.yield()
+			print("X2!", x)
 
-for _, x in ipairs{ 2, 27, 10003, 59253 } do
-	for _, y in ipairs{ 900, 84, 10000, 60000 } do
-		local num = mn.Morton2(x, y)
-		local mx, my = mn.MortonPair(num)
-		local x1, x2, y1, y2 = 32007, 803, 9339, 27
-
-		local a1, b1 = mn.MortonPairUpdate_X(num, x1), mn.Morton2(x1, y)
-		local a2, b2 = mn.MortonPairUpdate_X(num, x2), mn.Morton2(x2, y)
-		local a3, b3 = mn.MortonPairUpdate_Y(num, y1), mn.Morton2(x, y1)
-		local a4, b4 = mn.MortonPairUpdate_Y(num, y2), mn.Morton2(x, y2)
-
-		print("MORTON2!", num, mx, my, a1 == b1, a2 == b2, a3 == b3, a4 == b4)
-		print("")
-	end
-end
-
-for _, x in ipairs{ 2, 27, 103, 5925 } do
-	for _, y in ipairs{ 900, 84, 1000, 600 } do
-		for _, z in ipairs{ 87, 1011, 330, 57 } do
-			local num = mn.Morton3(x, y, z)
-			local mx, my, mz = mn.MortonTriple(num)
-			local x1, x2, y1, y2, z1, z2 = 307, 803, 933, 27, 402, 534
-
-			local a1, b1 = mn.MortonTripleUpdate_X(num, x1), mn.Morton3(x1, y, z)
-			local a2, b2 = mn.MortonTripleUpdate_X(num, x2), mn.Morton3(x2, y, z)
-			local a3, b3 = mn.MortonTripleUpdate_Y(num, y1), mn.Morton3(x, y1, z)
-			local a4, b4 = mn.MortonTripleUpdate_Y(num, y2), mn.Morton3(x, y2, z)
-			local a5, b5 = mn.MortonTripleUpdate_Z(num, z1), mn.Morton3(x, y, z1)
-			local a6, b6 = mn.MortonTripleUpdate_Z(num, z2), mn.Morton3(x, y, z2)
-
-			print("MORTON3!", num, mx, my, mz, a1 == b1, a2 == b2, a3 == b3, a4 == b4, a5 == b5, a6 == b6)
-			print("")
+			for num, yy in mc.Morton2_LineY(x, y, y2) do
+				assert(yy >= y and (yy == 0xFFFF or yy <= y2), "Bad line y")
+				assert(num == mc.Morton2(x, yy), "Bad line y solution")
+				ny=ny+1
+				if ny % 500 == 0 then coroutine.yield() end
+			end
+			coroutine.yield()
+			print("Y2!", y)
+			assert(nx > 0 and ny > 0, "N2?")
+--]]
 		end
 	end
+--]==]
 end
-]]
+do
+--[==[
+	local xt = { 0, 55, 321, 676, 1020, 1023 }
+	for i, x in ipairs(xt) do
+		local yt, x2 = { 0, 89, 374, 500, 1001, 1023 }, xt[i+1]
+		for j, y in ipairs(yt) do
+			local mx, my, mz = mc.Morton3(0xFFFF, x, y), mc.Morton3(x, 0xFFFF, y), mc.Morton3(x, y, 0xFFFF)
+			local zt, y2 = { 0, 200, 443, 500, 711, 1023 }, yt[j+1]
+			for k, z in ipairs(zt) do
+--[[
+				if mc.MortonTripleUpdate_X(mx, z) ~= mc.Morton3(z, x, y) then
+					print("Bad update3 x!", z, x, y)
+				end
+				if mc.MortonTripleUpdate_Y(my, z) ~= mc.Morton3(x, z, y) then
+					print("Bad update3 y!", x, z, y)
+				end
+				if mc.MortonTripleUpdate_Z(mz, z) ~= mc.Morton3(x, y, z) then
+					print("Bad update3 z!", x, y, z)
+				end
+--]]
+---[[
+				local z2, nx, ny, nz = zt[k+1], 0, 0, 0
+				for num, xx in mc.Morton3_LineX(y, z, x, x2) do
+					assert(xx >= x and (xx == 0x3FF or xx <= x2), "Bad line x")
+					assert(num == mc.Morton3(xx, y, z), "Bad line x solution")
+					nx=nx+1
+					if nx % 500 == 0 then coroutine.yield() end
+				end
+				coroutine.yield()
+				print("X3!")
+				for num, yy in mc.Morton3_LineY(x, z, y, y2) do
+					assert(yy >= y and (yy == 0x3FF or yy <= y2), "Bad line y")
+					assert(num == mc.Morton3(x, yy, z), "Bad line y solution")
+					ny=ny+1
+					if ny % 500 == 0 then coroutine.yield() end
+				end
+				coroutine.yield()
+				print("Y3!")
+				for num, zz in mc.Morton3_LineZ(x, y, z, z2) do
+					assert(zz >= z and (zz == 0x3FF or zz <= z2), "Bad line z")
+					assert(num == mc.Morton3(x, y, zz), "Bad line z solution")
+					nz=nz+1
+					if nz % 500 == 0 then coroutine.yield() end
+				end
+				coroutine.yield()
+				print("Z3!")
+				if nx == 0 or ny == 0 or nz == 0 then
+					print("N3?", nx, ny, nz)
+				end
+--]]
+			end
+		end
+	end
+--]==]
+end
+
+---[[
+print("Woo!")
+end, 50)
+--]]
+--]=]
