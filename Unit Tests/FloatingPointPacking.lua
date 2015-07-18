@@ -179,3 +179,54 @@ for i = 1, #list * 3 do
 		end
 	end)
 end
+
+
+--[=[
+
+	P_DEFAULT vec2 UnitPair (P_DEFAULT float xy)
+	{
+		P_UV float axy = abs(xy);
+		P_UV float frac = fract(axy);
+
+		return vec2((axy - frac) / 1023., sign(xy) * frac + .5);
+	}
+
+
+--- Encodes two numbers &isin; [0, 1] into a **mediump**-range float for retrieval in GLSL.
+-- @number x Number #1...
+-- @number y ...and #2.
+-- @treturn number Encoded pair.
+function M.Encode (x, y)
+	y = y - .5
+
+	return (y < 0 and -1 or 1) * (floor(1023 * x) + abs(y))
+end
+
+--- Decodes a **mediump**-range float, assumed to be encoded as per @{Encode}.
+-- @number pair Encoded pair.
+-- @treturn number Number #1...
+-- @treturn number ...and #2.
+function M.Decode (pair)
+	local apair = abs(pair)
+	local xpart = floor(apair)
+
+	return xpart / 1023, (pair < 0 and -1 or 1) * (apair - xpart) + .5
+end
+
+--- Prepares a unit pair-style parameter for addition to a kernel.
+--
+-- This parameter should be assigned values encoded as per @{Encode}.
+-- @string name Friendly name of shader parameter.
+-- @uint index Vertex userdata component index.
+-- @number defx Default number #1, cf. @{Encode}...
+-- @number defy ...and number #2.
+-- @treturn table Vertex userdata component.
+function M.VertexDatum (name, index, defx, defy)
+	return {
+		name = name,
+		default = _Encode_(defx, defy),
+		min = -1023.5, max = 1023.5,
+		index = index
+	}
+end
+]=]
