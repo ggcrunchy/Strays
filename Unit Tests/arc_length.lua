@@ -1,4 +1,4 @@
---- Assorted bitwise things
+--- Some arc length tests.
 
 --
 -- Permission is hereby granted, free of charge, to any person obtaining
@@ -23,53 +23,32 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
--- An 8-bit xor.
-function bxor (a, b)
-	local c, mask = a, 128
+local ss=require("tektite_core.number.sampling")
+local lut={}
+ss.Init(lut)
+ss.AddSample(lut, -1, 3)
+ss.AddSample(lut, 2, 5)
+ss.AddSample(lut, 2.5, 3)
+ss.AddSample(lut, 4, -2)
+ss.AddSample(lut, 5, 5)
+vdump(lut)
+ss.UpdateSample(lut, 3, 2.7, 3.1)
+vdump(lut)
 
-	a = a % 256
-	c = c - a
+print("")
 
-	for _ = 1, 8 do
-		local amask = a >= mask and mask or 0
-		local bmask = b >= mask and mask or 0
+local res = {}
 
-		if amask ~= bmask then
-			c = c + mask
-		end
-
-		mask, a, b = .5 * mask, a - amask, b - bmask
-	end
-
-	return c
+for _, x in ipairs{ -15, -1, 0, 2.3, 2.5, 2.7, 2.9, 4.9, 5, 6 } do
+	print("LOOKING UP (normal)", x)
+	ss.Lookup(lut, res, x)
+	vdump(res)
+	print("")
 end
 
---[[
-Incremental Gray code:
-    --
-    local half, inc = 0, 1
-
-	for i = ... -- loop
-        local gray = 0
-
-	    -- Compute the Gray code.
-	    local a, b, arem, flag = i, half, inc, 1
-
-        repeat
-	        local brem = b % 2
-
-	        if arem ~= brem then
-	            gray = gray + flag
-            end	            
-
-	        a, b = .5 * (a - arem), .5 * (b - brem)
-	        arem = a % 2
-	        flag = 2 * flag
-	    until a == b
-
-	-- stuff...
-
-		-- Update Gray code state.
-		half, inc = half + inc, 1 - inc
-	end
-]]
+for _, x in ipairs{ -.3, 0, .1, .2, .6, .9, 1, 1.2 } do
+	print("LOOKING UP (0-1)", x)
+	ss.Lookup_01(lut, res, x)
+	vdump(res)
+	print("")
+end

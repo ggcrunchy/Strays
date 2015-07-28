@@ -1,4 +1,4 @@
---- Assorted bitwise things
+--- Testing for dialog sections.
 
 --
 -- Permission is hereby granted, free of charge, to any person obtaining
@@ -23,53 +23,44 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
--- An 8-bit xor.
-function bxor (a, b)
-	local c, mask = a, 128
-
-	a = a % 256
-	c = c - a
-
-	for _ = 1, 8 do
-		local amask = a >= mask and mask or 0
-		local bmask = b >= mask and mask or 0
-
-		if amask ~= bmask then
-			c = c + mask
-		end
-
-		mask, a, b = .5 * mask, a - amask, b - bmask
-	end
-
-	return c
-end
-
+	-- Enumerate Properties --
+	-- arg1: Dialog
+	elseif what == "enum_props" then
 --[[
-Incremental Gray code:
-    --
-    local half, inc = 0, 1
+local TEST = arg1:BeginSection()
+--]]
+		arg1:AddCheckbox{ text = "Add to shapes?", value_name = "add_to_shapes" }
+--[[
+arg1:EndSection()
+timer.performWithDelay(250, function(e)
+		if e.count % 2 == 1 then
+			arg1:Collapse(TEST)
+		else
+			arg1:Expand(TEST)
+		end
+	end, 200)
+--]]
 
-	for i = ... -- loop
-        local gray = 0
+local function CB (a)
+	arg1:AddCheckbox{ text = a .. "?", value_name = a }
+end
+		arg1:AddCheckbox{ text = "Reappear after a while?", value_name = "reappear" }
+local A = arg1:BeginSection()
+CB"a"
+CB"b"
+CB"c"
+arg1:EndSection()
+CB"d"
+local B = arg1:BeginSection()
+CB"e"
+CB"f"
+arg1:EndSection()
+CB"g"
 
-	    -- Compute the Gray code.
-	    local a, b, arem, flag = i, half, inc, 1
-
-        repeat
-	        local brem = b % 2
-
-	        if arem ~= brem then
-	            gray = gray + flag
-            end	            
-
-	        a, b = .5 * (a - arem), .5 * (b - brem)
-	        arem = a % 2
-	        flag = 2 * flag
-	    until a == b
-
-	-- stuff...
-
-		-- Update Gray code state.
-		half, inc = half + inc, 1 - inc
+--arg1:EndSection()
+timer.performWithDelay(750, function(e)
+	if arg1.parent then
+		arg1:FlipTwoStates(A, B)
 	end
-]]
+	A, B = B, A
+end, 0)

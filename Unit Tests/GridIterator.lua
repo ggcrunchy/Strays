@@ -1,4 +1,4 @@
---- Assorted bitwise things
+--- Some tests for grid iterators.
 
 --
 -- Permission is hereby granted, free of charge, to any person obtaining
@@ -23,53 +23,41 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
--- An 8-bit xor.
-function bxor (a, b)
-	local c, mask = a, 128
+local fo = require("coroutine_ops.flow")
+local gi = require("iterator_ops.grid.ellipse") -- or circle, etc.
+local tt = require("corona_utils.timers")
 
-	a = a % 256
-	c = c - a
+local Dim, FadeMS = 10, 75
+local FadeSeconds = FadeMS / 1000
+local CX, CY = display.contentCenterX - Dim, display.contentCenterY - Dim
 
-	for _ = 1, 8 do
-		local amask = a >= mask and mask or 0
-		local bmask = b >= mask and mask or 0
+local op = gi.Ellipse -- Quadrant
 
-		if amask ~= bmask then
-			c = c + mask
-		end
-
-		mask, a, b = .5 * mask, a - amask, b - bmask
-	end
-
-	return c
+local function Color ()
+	return .3 + math.random() * .675
 end
 
---[[
-Incremental Gray code:
-    --
-    local half, inc = 0, 1
+tt.WrapEx(function()
+	local fade, fade_away, group = { alpha = 1, time = FadeMS }, { alpha = .1, delay = 600, onComplete = display.remove }
 
-	for i = ... -- loop
-        local gray = 0
+	while true do
+		group = display.newGroup()
 
-	    -- Compute the Gray code.
-	    local a, b, arem, flag = i, half, inc, 1
+		local w, h = math.random(4, 21), math.random(4, 21)
+		local text = display.newText(group, ("%i, %i"):format(w, h), 50, 50, native.systemFontBold, 25)
 
-        repeat
-	        local brem = b % 2
+		for x, y in op(w, h) do
+			local rect = display.newRect(group, CX + x * Dim, CY + y * Dim, Dim, Dim)
 
-	        if arem ~= brem then
-	            gray = gray + flag
-            end	            
+			rect:setFillColor(Color(), Color(), Color())
 
-	        a, b = .5 * (a - arem), .5 * (b - brem)
-	        arem = a % 2
-	        flag = 2 * flag
-	    until a == b
+			rect.alpha = .3
 
-	-- stuff...
+			transition.to(rect, fade)
 
-		-- Update Gray code state.
-		half, inc = half + inc, 1 - inc
+			fo.Wait(FadeSeconds)
+		end
+
+		transition.to(group, fade_away)
 	end
-]]
+end)

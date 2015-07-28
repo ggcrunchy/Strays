@@ -1,4 +1,4 @@
---- Assorted bitwise things
+--- Layout DSL tests.
 
 --
 -- Permission is hereby granted, free of charge, to any person obtaining
@@ -23,53 +23,37 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
--- An 8-bit xor.
-function bxor (a, b)
-	local c, mask = a, 128
+local rr = display.newRect(100, 100, 50, 50)
+rr:setFillColor(1, 0, 0)
+local dsl=require("corona_ui.utils.layout_dsl")
 
-	a = a % 256
-	c = c - a
+dsl.AddProperties(rr)
 
-	for _ = 1, 8 do
-		local amask = a >= mask and mask or 0
-		local bmask = b >= mask and mask or 0
+local opts = {
+	{ "left", 400 },
+	{ "center_y", 97 },
+	{ "right", 22 },
+	{ "bottom", "70%" },
+	{ "right", "from_right -87" },
+	{ "height", "18%" }
+}
 
-		if amask ~= bmask then
-			c = c + mask
-		end
-
-		mask, a, b = .5 * mask, a - amask, b - bmask
-	end
-
-	return c
+local function Details ()
+	print("X, Y", rr.x, rr.y)
+	print("LEFT, TOP", rr.left, rr.top)
+	print("RIGHT, BOTTOM", rr.right, rr.bottom)
+	print("CENTER", rr.center_x, rr.center_y)
+	print("")
 end
 
---[[
-Incremental Gray code:
-    --
-    local half, inc = 0, 1
+timer.performWithDelay(3000, function(e)
+	local k, v = unpack(opts[e.count])
 
-	for i = ... -- loop
-        local gray = 0
+	print("APPLYING: ", k, v)
 
-	    -- Compute the Gray code.
-	    local a, b, arem, flag = i, half, inc, 1
+	rr[k] = v
 
-        repeat
-	        local brem = b % 2
+	Details()
+end, #opts)
 
-	        if arem ~= brem then
-	            gray = gray + flag
-            end	            
-
-	        a, b = .5 * (a - arem), .5 * (b - brem)
-	        arem = a % 2
-	        flag = 2 * flag
-	    until a == b
-
-	-- stuff...
-
-		-- Update Gray code state.
-		half, inc = half + inc, 1 - inc
-	end
-]]
+Details()

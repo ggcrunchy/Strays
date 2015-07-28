@@ -1,4 +1,4 @@
---- Assorted bitwise things
+--- Some tests for grid operations.
 
 --
 -- Permission is hereby granted, free of charge, to any person obtaining
@@ -23,53 +23,36 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
--- An 8-bit xor.
-function bxor (a, b)
-	local c, mask = a, 128
+local grid_funcs = require("tektite_core.array.grid")
 
-	a = a % 256
-	c = c - a
+local function Comp (what, index, w, h, layout, col, row)
+	local c, r = grid_funcs.IndexToCell_Layout(index, w, h, layout)
 
-	for _ = 1, 8 do
-		local amask = a >= mask and mask or 0
-		local bmask = b >= mask and mask or 0
-
-		if amask ~= bmask then
-			c = c + mask
-		end
-
-		mask, a, b = .5 * mask, a - amask, b - bmask
-	end
-
-	return c
+	print(what, c, r, c == col, r == row)
 end
 
---[[
-Incremental Gray code:
-    --
-    local half, inc = 0, 1
+for _ = 1, 5 do
+	local w, h = math.random(4, 15), math.random(4, 15)
 
-	for i = ... -- loop
-        local gray = 0
+	print("W, H", w, h)
 
-	    -- Compute the Gray code.
-	    local a, b, arem, flag = i, half, inc, 1
+	for _ = 1, 4 do
+		local col, row = math.random(w), math.random(h)
 
-        repeat
-	        local brem = b % 2
+		print("COL, ROW", col, row)
 
-	        if arem ~= brem then
-	            gray = gray + flag
-            end	            
+		local index1 = grid_funcs.CellToIndex_Layout(col, row, w, h, "boundary")
+		local index2 = grid_funcs.CellToIndex_Layout(col, row, w, h, "boundary_horz")
+		local index3 = grid_funcs.CellToIndex_Layout(col, row, w, h, "boundary_vert")
+		local index4 = grid_funcs.CellToIndex_Layout(col, row, w, h, "normal")
 
-	        a, b = .5 * (a - arem), .5 * (b - brem)
-	        arem = a % 2
-	        flag = 2 * flag
-	    until a == b
+		print("INDICES", index1, index2, index3, index4)
 
-	-- stuff...
-
-		-- Update Gray code state.
-		half, inc = half + inc, 1 - inc
+		Comp("boundary, index -> cell", index1, w, h, "boundary", col, row)
+		Comp("boundary (horz), index -> cell", index2, w, h, "boundary_horz", col, row)
+		Comp("boundary (vert), index -> cell", index3, w, h, "boundary_vert", col, row)
+		Comp("normal, index -> cell", index4, w, h, "normal", col, row)
 	end
-]]
+
+	print("")
+end
